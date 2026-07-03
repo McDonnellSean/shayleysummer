@@ -32,8 +32,18 @@
     <div class="modal" id="modal">
       <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
       <p class="modal-date" id="modalDate"></p>
-      <h2 id="modalTitle"></h2>
-      <div class="modal-steps" id="modalSteps"></div>
+      <div class="modal-activities" id="modalActivities"></div>
+      <form class="add-form" id="addForm">
+        <input type="text" id="addInput" placeholder="Coffee → beach walk" autocomplete="off" required>
+        <div class="add-form-row">
+          <select id="addType">
+            <option value="weekday">Weekday hangout</option>
+            <option value="weekend">Weekend plan</option>
+            <option value="special">Special</option>
+          </select>
+          <button type="submit">Add</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -41,6 +51,6 @@
     <p>made with ♡ for the summer</p>
   </footer>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
