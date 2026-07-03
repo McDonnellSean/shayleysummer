@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shayley Summer — July 2026</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">Shayley Summer</p>
+    <h1>July 2026</h1>
+    <p class="subtitle">Every day between now and July 25th, mapped out.</p>
+  </header>
+
+  <main>
+    <div class="calendar-wrap">
+      <div class="weekday-labels">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div class="calendar" id="calendar"></div>
+    </div>
+
+    <div class="legend">
+      <span class="dot weekday"></span> Weekday hangout
+      <span class="dot weekend"></span> Weekend plan
+      <span class="dot special"></span> Special
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="overlay">
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+      <p class="modal-date" id="modalDate"></p>
+      <h2 id="modalTitle"></h2>
+      <div class="modal-steps" id="modalSteps"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>made with ♡ for the summer</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
