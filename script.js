@@ -71,8 +71,8 @@ let selectedDay = null;
 
 function buildCalendar() {
   calendarEl.innerHTML = "";
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear() === YEAR && today.getMonth() === MONTH;
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   for (let i = 0; i < firstWeekday; i++) {
     const empty = document.createElement("div");
@@ -81,8 +81,12 @@ function buildCalendar() {
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
+    const dateObj = new Date(YEAR, MONTH, d);
+    const isPast = dateObj < todayMidnight;
+    const isToday = dateObj.getTime() === todayMidnight.getTime();
+
     const dayEl = document.createElement("div");
-    dayEl.className = "day clickable" + (isCurrentMonth && today.getDate() === d ? " today" : "");
+    dayEl.className = "day clickable" + (isToday ? " today" : "") + (isPast ? " past" : "");
 
     const num = document.createElement("div");
     num.className = "day-num";

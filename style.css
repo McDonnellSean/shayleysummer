@@ -137,6 +137,25 @@ main {
   border-color: var(--terracotta);
 }
 
+.day.past {
+  opacity: 0.55;
+}
+
+.day.past .day-num {
+  position: relative;
+  display: inline-block;
+}
+
+.day.past .day-num::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  border-top: 2px solid var(--ink-soft);
+  transform: rotate(-8deg);
+}
+
 .event-chip {
   font-size: 0.72rem;
   line-height: 1.25;
