@@ -14,11 +14,30 @@
   </header>
 
   <main>
-    <div class="calendar-wrap">
-      <div class="weekday-labels">
-        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+    <div class="layout">
+      <div class="calendar-wrap">
+        <div class="weekday-labels">
+          <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+        </div>
+        <div class="calendar" id="calendar"></div>
       </div>
-      <div class="calendar" id="calendar"></div>
+
+      <aside class="queue-wrap">
+        <h2>Idea Queue</h2>
+        <p class="queue-hint">Drag onto a date when you're ready.</p>
+        <div class="queue-list" id="queueList"></div>
+        <form class="add-form" id="queueAddForm">
+          <input type="text" id="queueAddInput" placeholder="New idea…" autocomplete="off" required>
+          <div class="add-form-row">
+            <select id="queueAddType">
+              <option value="weekday">Weekday hangout</option>
+              <option value="weekend">Weekend plan</option>
+              <option value="special">Special</option>
+            </select>
+            <button type="submit">Add</button>
+          </div>
+        </form>
+      </aside>
     </div>
 
     <div class="legend">

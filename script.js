@@ -4,6 +4,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
   onSnapshot,
   getDocs,
@@ -62,12 +63,27 @@ const modalClose = document.getElementById("modalClose");
 const addForm = document.getElementById("addForm");
 const addInput = document.getElementById("addInput");
 const addType = document.getElementById("addType");
+const queueList = document.getElementById("queueList");
+const queueAddForm = document.getElementById("queueAddForm");
+const queueAddInput = document.getElementById("queueAddInput");
+const queueAddType = document.getElementById("queueAddType");
 
 const firstWeekday = new Date(YEAR, MONTH, 1).getDay();
 const daysInMonth = new Date(YEAR, MONTH + 1, 0).getDate();
 
 let activitiesByDay = {};
+let queueItems = [];
 let selectedDay = null;
+
+function splitSteps(text) {
+  return text.split("→").join(">").split("->").join(">")
+    .split(">").map((s) => s.trim()).filter(Boolean);
+}
+
+function rescheduleActivity(id, day) {
+  if (!id) return;
+  updateDoc(doc(db, "activities", id), { day });
+}
 
 function buildCalendar() {
   calendarEl.innerHTML = "";
@@ -97,12 +113,70 @@ function buildCalendar() {
       const chip = document.createElement("div");
       chip.className = "event-chip " + activity.type;
       chip.textContent = activity.steps.join(" → ");
+      chip.draggable = true;
+      chip.addEventListener("dragstart", (e) => {
+        e.stopPropagation();
+        e.dataTransfer.setData("text/plain", activity.id);
+        chip.classList.add("dragging");
+      });
+      chip.addEventListener("dragend", () => chip.classList.remove("dragging"));
       dayEl.appendChild(chip);
     });
 
     dayEl.addEventListener("click", () => openModal(d));
+    dayEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dayEl.classList.add("drag-over");
+    });
+    dayEl.addEventListener("dragleave", () => dayEl.classList.remove("drag-over"));
+    dayEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dayEl.classList.remove("drag-over");
+      rescheduleActivity(e.dataTransfer.getData("text/plain"), d);
+    });
     calendarEl.appendChild(dayEl);
   }
+}
+
+function renderQueue() {
+  queueList.innerHTML = "";
+
+  if (queueItems.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "queue-empty";
+    empty.textContent = "No ideas queued yet.";
+    queueList.appendChild(empty);
+    return;
+  }
+
+  queueItems.forEach((activity) => {
+    const item = document.createElement("div");
+    item.className = "queue-item " + activity.type;
+    item.draggable = true;
+
+    const text = document.createElement("span");
+    text.textContent = activity.steps.join(" → ");
+    item.appendChild(text);
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "queue-delete";
+    del.textContent = "×";
+    del.setAttribute("aria-label", "Delete");
+    del.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteDoc(doc(db, "activities", activity.id));
+    });
+    item.appendChild(del);
+
+    item.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", activity.id);
+      item.classList.add("dragging");
+    });
+    item.addEventListener("dragend", () => item.classList.remove("dragging"));
+
+    queueList.appendChild(item);
+  });
 }
 
 function renderModalActivities(day) {
@@ -151,10 +225,28 @@ function openModal(day) {
 addForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!selectedDay || !addInput.value.trim()) return;
-  const steps = addInput.value.split("→").join(">").split("->").join(">")
-    .split(">").map((s) => s.trim()).filter(Boolean);
+  const steps = splitSteps(addInput.value);
   await addDoc(activitiesRef, { day: selectedDay, type: addType.value, steps });
   addInput.value = "";
+});
+
+queueAddForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!queueAddInput.value.trim()) return;
+  const steps = splitSteps(queueAddInput.value);
+  await addDoc(activitiesRef, { day: null, type: queueAddType.value, steps });
+  queueAddInput.value = "";
+});
+
+queueList.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  queueList.classList.add("drag-over");
+});
+queueList.addEventListener("dragleave", () => queueList.classList.remove("drag-over"));
+queueList.addEventListener("drop", (e) => {
+  e.preventDefault();
+  queueList.classList.remove("drag-over");
+  rescheduleActivity(e.dataTransfer.getData("text/plain"), null);
 });
 
 modalClose.addEventListener("click", () => overlay.classList.remove("open"));
@@ -167,12 +259,18 @@ document.addEventListener("keydown", (e) => {
 
 onSnapshot(activitiesRef, (snap) => {
   activitiesByDay = {};
+  queueItems = [];
   snap.forEach((docSnap) => {
     const data = docSnap.data();
     const activity = { id: docSnap.id, type: data.type, steps: data.steps };
-    (activitiesByDay[data.day] ||= []).push(activity);
+    if (data.day == null) {
+      queueItems.push(activity);
+    } else {
+      (activitiesByDay[data.day] ||= []).push(activity);
+    }
   });
   buildCalendar();
+  renderQueue();
   if (overlay.classList.contains("open") && selectedDay) {
     renderModalActivities(selectedDay);
   }
