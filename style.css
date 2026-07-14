@@ -138,22 +138,18 @@ main {
 }
 
 .day.past {
+  position: relative;
   opacity: 0.55;
 }
 
-.day.past .day-num {
-  position: relative;
-  display: inline-block;
-}
-
-.day.past .day-num::after {
+.day.past::after {
   content: "";
   position: absolute;
-  left: -2px;
-  right: -2px;
-  top: 50%;
-  border-top: 2px solid var(--ink-soft);
-  transform: rotate(-8deg);
+  inset: 4px;
+  pointer-events: none;
+  background:
+    linear-gradient(to top right, transparent calc(50% - 1px), var(--ink-soft) 50%, transparent calc(50% + 1px)),
+    linear-gradient(to top left, transparent calc(50% - 1px), var(--ink-soft) 50%, transparent calc(50% + 1px));
 }
 
 .event-chip {
